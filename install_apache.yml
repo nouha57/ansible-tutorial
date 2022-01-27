@@ -6,15 +6,38 @@
 
   - name: update repository index 
     apt:
+      upgrade: dist      
       update_cache: yes 
+    when: ansible_distribution == "Ubuntu"
 
-  - name: install apache2 package 
+- hosts: web_servers
+  become: true
+  tasks:
+  - name: install apache and php for ubuntu servers
+    tags: apache, apache2, ubuntu
     apt:
-      name: apache2
-      state: latest 
-
-
-  - name: add php support for apache 
-    apt:
-      name: libapache2-mod-php
+      name:
+        - apache2
+        - libapache2-mod-php
       state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  
+- hosts: db_servers
+  become: true
+  tasks:
+  - name: install mariadb package ( centos ) 
+    tags: centos, db, mariadb
+    dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "Centos"
+
+  - name: install mariadb package ( ubuntu ) 
+    tags: ubuntu, db, mariadb
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+
